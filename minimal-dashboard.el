@@ -302,28 +302,26 @@ FRAME is optional and provided by `window-size-change-functions'."
   (let ((buf (get-buffer-create (minimal-dashboard--refresh-buffer-name))))
     (delete-other-windows)
     (with-current-buffer buf
-        (setq-local inhibit-read-only t
-                    view-read-only nil
-                    buffer-read-only t
-                    cursor-type nil
-                    frame-title-format "Emacs")
-
-        (display-line-numbers-mode -1)
-        (hl-line-mode -1)
-
+      (let ((display-line-numbers-mode nil)
+            (inhibit-read-only t)
+            (view-read-only nil))
+        (erase-buffer)
+        (minimal-dashboard--insert-centered-info)
         (unless minimal-dashboard-modeline-shown
           (setq-local mode-line-format nil))
-
-        (when (fboundp 'meow-mode)
+        (when (fboundp 'meow-motion-mode)
+          (meow-motion-mode)
           (setq-local meow-cursor-type-default nil)
           (setq-local meow-cursor-type-normal nil)
           (setq-local meow-cursor-type-keypad nil))
-
-        (erase-buffer)
-        (minimal-dashboard--insert-centered-info)
+        (setq-local cursor-type nil
+                    frame-title-format "Emacs"
+                    global-hl-line-mode nil)
+        (setq buffer-read-only t)
         (use-local-map minimal-dashboard-mode-map)
-        (minimal-dashboard--resize-handler)
+        (minimal-dashboard--resize-handler))
     buf)))
+
 
 (provide 'minimal-dashboard)
 
